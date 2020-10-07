@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="spring.fullstack.user">
+
+<insert id="userJoin" parameterType="UDto">
+INSERT INTO NOBRAND.USERDATA
+(ID, PW, EMAIL, LOGINTIME, LOGOUTTIME, AUTH, ENABLED)
+VALUES(#{id}, #{pw}, #{email}, SYSDATE,SYSDATE,'ROLE_User', 'N')
+</insert>
+
+<select id="allUser" resultType="UDto">
+SELECT * FROM USERDATA
+</select>
+
+<!-- 아이디 중복검사 -->
+<!-- 비밀번호 찾기 때 아이디 확인으로도 사용 -->
+<select id="idChk" resultType="java.lang.String" parameterType="java.lang.String">
+SELECT ID
+FROM USERDATA
+WHERE ID=#{id}
+</select>
+
+<!-- 로그인(시큐리티) -->
+<select id="login" resultType="UDto" parameterType="java.lang.String">
+SELECT PW,AUTH
+FROM USERDATA 
+WHERE ID=#{id}
+</select>	
+
+<!--LoginSuccessHandler에서 사용하기 위한(회원상태, 회원 권한 판단) 로그인한 유저 가져오기-->
+<select id="getLoginUser"  resultType="UDto" parameterType="java.lang.String">
+SELECT ID,EMAIL,LOGINTIME,LOGOUTTIME,AUTH
+FROM USERDATA 
+WHERE ID=#{id}
+</select>
+
+<!-- 로그인/로그아웃 기록-->
+<insert id="logInsert" parameterType="LDto">
+INSERT INTO NOBRAND.LOGRECORD
+(LOG_SEQ, ID, IN_OR_OUT, LOG_TIME)
+VALUES(LOG_SEQ.NEXTVAL, #{id}, #{in_or_out}, SYSDATE)
+</insert>
+
+<!-- 모든 로그 가져오기 -->
+<select id="getAllLogRecord" resultType="LDto">
+SELECT LOG_SEQ, ID, IN_OR_OUT, LOG_TIME 
+FROM LOGRECORD
+ORDER BY LOG_SEQ
+</select>
+
+</mapper>
